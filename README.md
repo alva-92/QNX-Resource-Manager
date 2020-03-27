@@ -1,0 +1,1 @@
+# QNX-Resource-Manager
