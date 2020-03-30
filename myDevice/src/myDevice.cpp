@@ -102,10 +102,13 @@ int main(int argc, char *argv[]) {
 	dispatch_context_t   *ctp;
 	int id;
 
-	if ((dpp = dispatch_create ()) == NULL) {
+	if ((dpp = dispatch_create ()) == NULL)
+	{
 		fprintf (stderr,
-	                 "%s:  Unable to allocate dispatch context.\n", argv [0]);
-		return (EXIT_FAILURE);
+				"%s:  Unable to allocate dispatch context.\n",
+				argv [0]);
+
+		return EXIT_FAILURE;
 	}
 	iofunc_func_init(_RESMGR_CONNECT_NFUNCS, &connect_funcs, _RESMGR_IO_NFUNCS, &io_funcs);
 	connect_funcs.open = io_open;
@@ -117,9 +120,12 @@ int main(int argc, char *argv[]) {
 	if ((id = resmgr_attach (dpp, NULL, "/dev/local/mydevice",
 					_FTYPE_ANY, 0, &connect_funcs, &io_funcs,
 	                &ioattr)) == -1) {
+
 		fprintf (stderr,
-				"%s:  Unable to attach name.\n", argv [0]);
-		return (EXIT_FAILURE);
+				"%s:  Unable to attach name.\n",
+				argv [0]);
+
+		return EXIT_FAILURE;
 	}
 
 	ctp = dispatch_context_alloc(dpp);

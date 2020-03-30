@@ -26,6 +26,11 @@ void status_check(){
 
 	FILE *fp;
 	int c;
+	my_message_t msg;
+	my_message_t msg2;
+	char second[255];
+	memset( &msg, 0, sizeof(my_message_t));
+	memset( &msg2, 0, sizeof(my_message_t));
 	fp = fopen("/dev/local/mydevice", "r");
 	if (fp == NULL)
 	{
@@ -34,20 +39,13 @@ void status_check(){
 	}
 	else
 	{
-		   while(1) {
-			  c = fgetc(fp);
-			  if( feof(fp) ) {
-				 break;
-			  }
-			  printf("%c", c);
-			  // IF VALUE == STATUS
-			  	  // PRINT VALUE
-			  // IF VALUE == CLOSED
-			  	  // name_detach
-			  	  // EXIT
-			  // Close device by its fds
-		   }
-		   fclose(fp);
+		fscanf(fp, "%s %s",msg2.msg, msg.msg);
+		printf("\nReading with fscanf %s - %s\n", msg2.msg, msg.msg);
+		if (strcmp("closed", msg.msg) == 0){
+			printf("Terminating program");
+			exit(0);
+		}
+		fclose(fp);
 	}
 
 }
@@ -85,11 +83,6 @@ int main() {
 	        	   status_check();
 	               break;
 	           default:
-	               /*
-	                * A pulse sent by one of your processes or a
-	                * _PULSE_CODE_COIDDEATH or _PULSE_CODE_THREADDEATH
-	                * from the kernel?
-	                */
 	        	   printf("Not the expected code");
 	               break;
 	           }
