@@ -38,9 +38,13 @@ int status_check(){
 	else
 	{
 		fscanf(fp, "%s %s",first, second);
+
+		if (strcmp("",second)!=0){
+			printf("Status: %s\n", second);
+		}
+
 		if (strcmp("closed", second) == 0)
 		{
-			printf("Terminating program");
 			return 1;
 		}
 		fclose(fp);
