@@ -22,30 +22,29 @@ typedef union
 	char msg[255];
 } my_message_t;
 
-void status_check(){
+int status_check(){
 
 	FILE *fp;
-	int c;
-	my_message_t msg;
-	my_message_t msg2;
+	char first[255];
 	char second[255];
-	memset( &msg, 0, sizeof(my_message_t));
-	memset( &msg2, 0, sizeof(my_message_t));
+	memset( &first, 0, sizeof(255));
+	memset( &second, 0, sizeof(255));
 	fp = fopen("/dev/local/mydevice", "r");
 	if (fp == NULL)
 	{
 		printf("Failed to check device status");
-		return;
+		return 1;
 	}
 	else
 	{
-		fscanf(fp, "%s %s",msg2.msg, msg.msg);
-		printf("\nReading with fscanf %s - %s\n", msg2.msg, msg.msg);
-		if (strcmp("closed", msg.msg) == 0){
+		fscanf(fp, "%s %s",first, second);
+		if (strcmp("closed", second) == 0)
+		{
 			printf("Terminating program");
-			exit(0);
+			return 1;
 		}
 		fclose(fp);
+		return 0;
 	}
 
 }
@@ -63,31 +62,42 @@ int main() {
 	}
 
 
-	status_check();
+	if (status_check() != 0){
+		/* Remove the name from the space */
+		name_detach(attach, 0);
+	}
 
 
 	while(1)
 	{
-	       rcvid = MsgReceivePulse(attach->chid, &msg, sizeof(msg), NULL);
+	   rcvid = MsgReceivePulse(attach->chid, &msg, sizeof(msg), NULL);
 
-	       if (rcvid == -1) {/* Error condition, exit */
-	    	   printf("Failed to receive message");
-	           break;
-	       }
+	   if (rcvid == -1) /* Error condition, exit */
+	   {
+		   printf("Failed to receive message");
+		   break;
+	   }
 
 
-	       if (rcvid == 0) {/* Pulse received */
-	           switch (msg.pulse.code) {
-	           case MY_PULSE_CODE:
-	        	   printf("Small Integer: %d\n", msg.pulse.value.sival_int);
-	        	   status_check();
-	               break;
-	           default:
-	        	   printf("Not the expected code");
-	               break;
-	           }
-	           continue;
-	       }
+	   if (rcvid == 0) /* Pulse received */
+	   {
+		   switch (msg.pulse.code)
+		   {
+			   case MY_PULSE_CODE:
+				   printf("Small Integer: %d\n", msg.pulse.value.sival_int);
+					if (status_check() != 0)
+					{
+						/* Remove the name from the space */
+						name_detach(attach, 0);
+						exit(0);
+					}
+				   break;
+			   default:
+				   printf("Not the expected code");
+				   break;
+			   }
+		   continue;
+	   }
 
 	}
 
